@@ -1,0 +1,15 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Laundry user")
+System_Boundary(c1, "Sample System") {
+    Container(web_app, "Front-end Application", "React", "A better UI for laudnry booking system")
+    Container(python_api, "Backend-end Application", "python", "Communicates with Sakrafast ASP.net application")
+}
+
+System_Ext(sakrafast, "Sakrafast")
+
+Rel(user, web_app, "Uses", "HTTPS")
+Rel(web_app, python_api, "Manages bookings using", "HTTPS")
+Rel(python_api, sakrafast, "Polls, manages bookings status", "HTTPS")
+@enduml

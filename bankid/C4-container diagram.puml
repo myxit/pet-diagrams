@@ -1,0 +1,30 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+AddRelTag("async", $lineStyle = DashedLine())
+
+Container(testRunner, "Test runner", "A test runner that uses System's API")
+Container_Ext(bankid_api, "BankID", "Bank ID System", "Provides BankID service API")
+
+System_Boundary(c1, "BankID Authorizaton System") {
+    Container(front_api, "Front API", "python", "Handles all business logic")
+    Container(mobile, "Mobile Phone", "Android", "Refresh/display QR from the QR Manager API (websockets)")
+    Container(mobile_api, "Mobile Phone Manager API", "python", "Returns the state of the BankID app")
+    
+    Container(qr_api, "QR Manager API", "python", "Responsible for displaying QR code in specific screen place")
+    Container(qr_frontend, "QR SPA", "react", "Refresh/display QR from the QR Manager API (websockets)")
+}
+
+Rel(testRunner, front_api, "Pushes", "QR, personal number")
+Rel(qr_frontend, mobile, "Reads", $tags="async")
+
+Rel(front_api, qr_api, "Updates")
+Rel(qr_api, qr_frontend, "Updates")
+
+Rel(mobile, mobile_api, "adb", "Reads BankID app state from phone")
+Rel(front_api, mobile_api, "Signs", "BankID ")
+
+Rel(mobile, bankid_api, "Updates")
+
+SHOW_LEGEND()
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+    participant "Jest runner" as Jest
+    participant "Front API" as front_api
+    participant "QR Display API" as qr_display_api
+    participant "Mobile Manager" as mobile_api
+
+    Jest -> front_api : "POST process, {QR, SSN}"
+        front_api -> qr_display_api : "call: display QR code"
+        front_api <- qr_display_api : "OK"
+            
+        front_api -> mobile_api : "start BankID"
+            activate front_api #DarkSalmon
+        front_api <- mobile_api : "OK"
+    Jest <- front_api : "OK: {id}"
+
+    Jest -> front_api : "GET process/{id}"
+        
+    Jest <- front_api : "OK: {status: STARTING}"
+
+    front_api <- mobile_api : "state: signing"
+
+    == Updating QR during the process ==
+    
+    Jest -> front_api : PUT process/{id} {new_qr}
+        front_api -> qr_display_api : "call: display QR code"
+        front_api <- qr_display_api : "OK"
+    Jest <- front_api : {id, status}
+
+    == Finishing up ==
+
+    front_api <- mobile_api : "state: signed"
+            deactivate front_api
+        
+    Jest -> front_api : "GET process/{id}"
+    Jest <- front_api : {OK: {status: SIGNED}}
+        
+@enduml

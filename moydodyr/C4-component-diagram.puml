@@ -1,0 +1,25 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+System(web_app, "Front-end Application", "Container: JavaScript and React", "Provides all of the Internet laundry booking functionality")
+
+System_Boundary(c1, "Sample System") {
+    Component(signin_controller, "Sign In Controller", "Component: Fast API", "Allows users to sign in to the System")
+    Component(laundry_controller, "Laundry Controller", "Component: Fast API", "Provides information about available laundries")
+    Component(booking_controller, "Booking Controller", "Component: Fast API", "Allows users manage their bookings")
+
+    Component(els_session, "ELS Session Facade", "Component: Request + BeautifulSoup", "Provides overall interface on top of Sakrafast ELS system")
+}
+
+System_Ext(sakrafast, "Sakrafast")
+
+Rel(web_app, signin_controller, "Makes API calls to", "JSON/HTTPS")
+Rel(web_app, laundry_controller, "Makes API calls to", "JSON/HTTPS")
+Rel(web_app, booking_controller, "Makes API calls to", "JSON/HTTPS")
+
+Rel(signin_controller, els_session, "Polls, manages bookings status", "HTTPS")
+Rel(laundry_controller, els_session, "Polls, manages bookings status", "HTTPS")
+Rel(booking_controller, els_session, "Polls, manages bookings status", "HTTPS")
+
+Rel(els_session, sakrafast, "Polls, manages bookings status", "HTTPS")
+@enduml
